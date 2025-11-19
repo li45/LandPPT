@@ -278,11 +278,11 @@ class DocumentProcessor:
                 logger.warning(f"指定编码 {encoding} 失败，尝试自动检测")
         
         # 自动检测编码
-        for enc in self.encoding_detectors:
+        for encoding in self.encoding_detectors:
             try:
-                with open(file_path, 'r', encoding=enc) as f:
-                    content = f.read()
-                    return content, enc
+                with open(file_path, 'r', encoding=encoding) as file:
+                    content = file.read()
+                    return content, encoding
             except UnicodeDecodeError:
                 continue
         
@@ -312,16 +312,16 @@ class DocumentProcessor:
             # 尝试不同编码
             encodings_to_try = [encoding] if encoding else self.encoding_detectors
             
-            for enc in encodings_to_try:
+            for current_encoding in encodings_to_try:
                 try:
-                    df = pd.read_csv(file_path, encoding=enc)
+                    dataframe = pd.read_csv(file_path, encoding=current_encoding)
                     # 将DataFrame转换为文本描述
-                    text = f"数据表包含 {len(df)} 行 {len(df.columns)} 列\n\n"
-                    text += f"列名: {', '.join(df.columns)}\n\n"
+                    text = f"数据表包含 {len(dataframe)} 行 {len(dataframe.columns)} 列\n\n"
+                    text += f"列名: {', '.join(dataframe.columns)}\n\n"
                     text += "数据预览:\n"
-                    text += df.head(10).to_string()
+                    text += dataframe.head(10).to_string()
                     
-                    return text, enc
+                    return text, current_encoding
                 except UnicodeDecodeError:
                     continue
             
@@ -386,8 +386,8 @@ class DocumentProcessor:
         try:
             import pypdf
 
-            with open(file_path, 'rb') as f:
-                reader = pypdf.PdfReader(f)
+            with open(file_path, 'rb') as pdf_file:
+                reader = pypdf.PdfReader(pdf_file)
                 text = ""
                 for page in reader.pages:
                     text += page.extract_text() + "\n"
@@ -395,8 +395,8 @@ class DocumentProcessor:
                 return text.strip(), "utf-8"
         except ImportError:
             raise ImportError("请安装pypdf: pip install pypdf")
-        except Exception as e:
-            raise ValueError(f"PDF文件读取失败: {e}")
+        except Exception as error:
+            raise ValueError(f"PDF文件读取失败: {error}")
 
     def _extract_docx_fallback(self, file_path: str) -> Tuple[str, str]:
         """DOCX文件回退提取方法"""
@@ -411,8 +411,8 @@ class DocumentProcessor:
             return text.strip(), "utf-8"
         except ImportError:
             raise ImportError("请安装python-docx: pip install python-docx")
-        except Exception as e:
-            raise ValueError(f"DOCX文件读取失败: {e}")
+        except Exception as error:
+            raise ValueError(f"DOCX文件读取失败: {error}")
 
     def _extract_html_fallback(self, file_path: str, encoding: Optional[str] = None) -> Tuple[str, str]:
         """HTML文件回退提取方法"""
@@ -451,20 +451,20 @@ class DocumentProcessor:
             markdown_path = os.path.join(self.temp_dir, markdown_filename)
 
             # 保存Markdown文件
-            with open(markdown_path, 'w', encoding='utf-8', newline='\n') as f:
+            with open(markdown_path, 'w', encoding='utf-8', newline='\n') as markdown_file:
                 # 添加文件头信息
-                f.write(f"# {base_name}\n\n")
-                f.write(f"**原文件**: {original_file_path}\n")
-                f.write(f"**转换时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"**转换工具**: MarkItDown\n\n")
-                f.write("---\n\n")
-                f.write(markdown_content)
+                markdown_file.write(f"# {base_name}\n\n")
+                markdown_file.write(f"**原文件**: {original_file_path}\n")
+                markdown_file.write(f"**转换时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                markdown_file.write(f"**转换工具**: MarkItDown\n\n")
+                markdown_file.write("---\n\n")
+                markdown_file.write(markdown_content)
 
             logger.info(f"Markdown文件已保存: {markdown_path}")
             return markdown_path
 
-        except Exception as e:
-            logger.warning(f"保存Markdown文件失败: {e}")
+        except Exception as error:
+            logger.warning(f"保存Markdown文件失败: {error}")
             return ""
 
     def is_supported_format(self, file_path: str) -> bool:

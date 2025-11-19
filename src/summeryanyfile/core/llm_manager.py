@@ -171,7 +171,7 @@ class LLMManager:
 
         # 添加其他参数（排除已处理的）
         excluded_keys = {"api_key", "base_url"}
-        openai_kwargs.update({k: v for k, v in kwargs.items() if k not in excluded_keys})
+        openai_kwargs.update({key: value for key, value in kwargs.items() if key not in excluded_keys})
 
         return ChatOpenAI(**openai_kwargs)
     
@@ -197,7 +197,7 @@ class LLMManager:
             temperature=temperature,
             # max_tokens=max_tokens,
             api_key=api_key,
-            **{k: v for k, v in kwargs.items() if k != "api_key"}
+            **{key: value for key, value in kwargs.items() if key != "api_key"}
         )
     
     def _create_azure_llm(
@@ -229,7 +229,7 @@ class LLMManager:
             api_key=api_key,
             azure_endpoint=azure_endpoint,
             api_version=api_version,
-            **{k: v for k, v in kwargs.items() if k not in ["api_key", "azure_endpoint", "api_version"]}
+            **{key: value for key, value in kwargs.items() if key not in ["api_key", "azure_endpoint", "api_version"]}
         )
 
     def _create_ollama_llm(
@@ -258,7 +258,7 @@ class LLMManager:
 
         # 添加其他参数（排除已处理的）
         excluded_keys = {"base_url", "max_tokens"}
-        ollama_kwargs.update({k: v for k, v in kwargs.items() if k not in excluded_keys})
+        ollama_kwargs.update({key: value for key, value in kwargs.items() if key not in excluded_keys})
 
         logger.info(f"使用Ollama端点: {base_url}")
         return ChatOllama(**ollama_kwargs)
@@ -290,7 +290,7 @@ class LLMManager:
 
         # 添加其他参数（排除已处理的）
         excluded_keys = {"api_key", "max_tokens"}
-        gemini_kwargs.update({k: v for k, v in kwargs.items() if k not in excluded_keys})
+        gemini_kwargs.update({key: value for key, value in kwargs.items() if key not in excluded_keys})
 
         return ChatGoogleGenerativeAI(**gemini_kwargs)
     

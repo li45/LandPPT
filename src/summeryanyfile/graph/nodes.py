@@ -24,7 +24,7 @@ class GraphNodes(LoggerMixin):
         self.json_parser = JSONParser()
         self.config = config  # 添加配置参数
 
-    def _get_slides_range_text(self, state: Dict[str, Any]) -> str:
+    def _generate_slide_count_constraint_text(self, state: Dict[str, Any]) -> str:
         """根据状态中的页数模式生成页数约束文本"""
         page_count_mode = state.get("page_count_mode", "ai_decide")
         min_pages = state.get("min_pages")
@@ -32,13 +32,13 @@ class GraphNodes(LoggerMixin):
         fixed_pages = state.get("fixed_pages")
 
         if page_count_mode == "fixed" and fixed_pages:
-            result = f"【强制要求】必须生成恰好{fixed_pages}页的PPT，不能多也不能少"
+            constraint_text = f"【强制要求】必须生成恰好{fixed_pages}页的PPT，不能多也不能少"
         elif page_count_mode == "custom_range" and min_pages and max_pages:
-            result = f"【强制要求】必须严格控制在{min_pages}-{max_pages}页范围内，最少{min_pages}页，最多{max_pages}页，不能超出此范围"
+            constraint_text = f"【强制要求】必须严格控制在{min_pages}-{max_pages}页范围内，最少{min_pages}页，最多{max_pages}页，不能超出此范围"
         else:  # ai_decide
-            result = "根据内容的复杂度、深度和逻辑结构，自主决定最合适的页数，确保内容充实且逻辑清晰"
+            constraint_text = "根据内容的复杂度、深度和逻辑结构，自主决定最合适的页数，确保内容充实且逻辑清晰"
 
-        return result
+        return constraint_text
     
     async def analyze_structure(self, state: PPTState, config: RunnableConfig) -> Dict[str, Any]:
         """
@@ -145,7 +145,7 @@ class GraphNodes(LoggerMixin):
             }
 
             # 添加页数范围信息
-            slides_range_text = self._get_slides_range_text(state)
+            slides_range_text = self._generate_slide_count_constraint_text(state)
             chain_inputs["slides_range"] = slides_range_text
             if self.config:
                 chain_inputs["target_language"] = self.config.target_language
@@ -243,7 +243,7 @@ class GraphNodes(LoggerMixin):
             }
 
             # 添加页数范围信息和目标语言
-            slides_range_text = self._get_slides_range_text(state)
+            slides_range_text = self._generate_slide_count_constraint_text(state)
             chain_inputs["slides_range"] = slides_range_text
             if self.config:
                 chain_inputs["target_language"] = self.config.target_language
@@ -321,7 +321,7 @@ class GraphNodes(LoggerMixin):
             }
 
             # 添加页数范围信息和目标语言
-            slides_range_text = self._get_slides_range_text(state)
+            slides_range_text = self._generate_slide_count_constraint_text(state)
             chain_inputs["slides_range"] = slides_range_text
             if self.config:
                 chain_inputs["target_language"] = self.config.target_language
