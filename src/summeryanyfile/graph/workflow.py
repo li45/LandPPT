@@ -132,8 +132,8 @@ class WorkflowManager(LoggerMixin):
             self.logger.info("PPT生成工作流执行完成")
             return final_state
             
-        except Exception as e:
-            self.logger.error(f"工作流执行失败: {e}")
+        except Exception as workflow_error:
+            self.logger.error(f"工作流执行失败: {workflow_error}")
             raise
     
     def _determine_workflow_step_name(self, state: Dict[str, Any], step_count: int) -> str:
@@ -233,10 +233,10 @@ class WorkflowExecutor:
                 initial_state, 
                 progress_callback
             )
-        except Exception as e:
-            self.logger.error(f"工作流执行出错: {e}")
+        except Exception as execution_error:
+            self.logger.error(f"工作流执行出错: {execution_error}")
             if error_callback:
-                error_callback(e)
+                error_callback(execution_error)
             raise
     
     async def execute_with_checkpoints(

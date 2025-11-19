@@ -98,8 +98,8 @@ class GraphNodes(LoggerMixin):
                 "accumulated_context": first_chunk[:500]  # 保留前500字作为上下文
             }
             
-        except Exception as e:
-            self.logger.error(f"文档结构分析失败: {e}")
+        except Exception as analysis_error:
+            self.logger.error(f"文档结构分析失败: {analysis_error}")
             # 返回默认结构
             return {
                 "document_structure": {
@@ -176,8 +176,8 @@ class GraphNodes(LoggerMixin):
                 "current_index": 1
             }
             
-        except Exception as e:
-            self.logger.error(f"初始PPT框架生成失败: {e}")
+        except Exception as outline_error:
+            self.logger.error(f"初始PPT框架生成失败: {outline_error}")
             # 返回默认框架
             return {
                 "ppt_title": "学术演示",
@@ -277,8 +277,8 @@ class GraphNodes(LoggerMixin):
                 "accumulated_context": new_context
             }
             
-        except Exception as e:
-            self.logger.error(f"PPT大纲细化失败: {e}")
+        except Exception as refinement_error:
+            self.logger.error(f"PPT大纲细化失败: {refinement_error}")
             # 继续处理下一个块
             return {
                 **state,
@@ -405,8 +405,8 @@ class GraphNodes(LoggerMixin):
                 "slides": slides
             }
             
-        except Exception as e:
-            self.logger.error(f"PPT大纲最终优化失败: {e}")
+        except Exception as finalization_error:
+            self.logger.error(f"PPT大纲最终优化失败: {finalization_error}")
             # 返回当前状态，但标记为最终状态
             slides = state["slides"]
             for i, slide in enumerate(slides):

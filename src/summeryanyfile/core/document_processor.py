@@ -289,8 +289,8 @@ class DocumentProcessor:
         # 使用chardet作为最后手段
         try:
             import chardet
-            with open(file_path, 'rb') as f:
-                raw_data = f.read()
+            with open(file_path, 'rb') as raw_file:
+                raw_data = raw_file.read()
                 result = chardet.detect(raw_data)
                 detected_encoding = result['encoding']
                 if detected_encoding:
@@ -298,8 +298,8 @@ class DocumentProcessor:
                     return content, detected_encoding
         except ImportError:
             logger.warning("chardet未安装，无法进行高级编码检测")
-        except Exception as e:
-            logger.warning(f"chardet检测失败: {e}")
+        except Exception as chardet_error:
+            logger.warning(f"chardet检测失败: {chardet_error}")
         
         raise ValueError(f"无法检测文件编码: {file_path}")
     
