@@ -106,8 +106,8 @@ class ChainManager(LoggerMixin):
             result = await chain.ainvoke(inputs, config or {})
             self.logger.debug(f"处理链 {chain_name} 执行成功")
             return result
-        except Exception as e:
-            self.logger.error(f"处理链 {chain_name} 执行失败: {e}")
+        except Exception as chain_error:
+            self.logger.error(f"处理链 {chain_name} 执行失败: {chain_error}")
             raise
     
     def list_chains(self) -> list:
@@ -181,9 +181,9 @@ class ChainExecutor:
                 if attempt > 0:
                     self.logger.info(f"处理链 {chain_name} 在第 {attempt + 1} 次尝试后成功")
                 return result
-            except Exception as e:
-                last_exception = e
-                self.logger.warning(f"处理链 {chain_name} 第 {attempt + 1} 次尝试失败: {e}")
+            except Exception as retry_error:
+                last_exception = retry_error
+                self.logger.warning(f"处理链 {chain_name} 第 {attempt + 1} 次尝试失败: {retry_error}")
                 
                 if attempt < self.max_retries - 1:
                     # 可以在这里添加退避策略

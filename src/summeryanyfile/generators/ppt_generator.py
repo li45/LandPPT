@@ -62,8 +62,8 @@ class PPTOutlineGenerator(LoggerMixin):
                 temperature=self.config.temperature,
                 max_tokens=self.config.max_tokens
             )
-        except Exception as e:
-            self.logger.error(f"LLM初始化失败: {e}")
+        except Exception as initialization_error:
+            self.logger.error(f"LLM初始化失败: {initialization_error}")
             raise
     
     async def generate_from_text(
@@ -150,8 +150,8 @@ class PPTOutlineGenerator(LoggerMixin):
             self.logger.info(f"PPT大纲生成完成，共 {outline.total_pages} 页")
             return outline
             
-        except Exception as e:
-            self.logger.error(f"PPT大纲生成失败: {e}")
+        except Exception as generation_error:
+            self.logger.error(f"PPT大纲生成失败: {generation_error}")
             raise
     
     async def generate_from_file(
@@ -218,8 +218,8 @@ class PPTOutlineGenerator(LoggerMixin):
                 fixed_pages
             )
 
-        except Exception as e:
-            self.logger.error(f"从文件生成PPT大纲失败: {e}")
+        except Exception as file_generation_error:
+            self.logger.error(f"从文件生成PPT大纲失败: {file_generation_error}")
             raise
     
     def _state_to_outline(self, state: Dict[str, Any]) -> PPTOutline:
@@ -328,9 +328,9 @@ class PPTOutlineGenerator(LoggerMixin):
                     target_audience, custom_audience, ppt_style, custom_style_prompt
                 )
                 
-            except Exception as e:
-                last_exception = e
-                self.logger.warning(f"第 {attempt + 1} 次尝试失败: {e}")
+            except Exception as retry_error:
+                last_exception = retry_error
+                self.logger.warning(f"第 {attempt + 1} 次尝试失败: {retry_error}")
                 
                 if attempt < max_retries - 1:
                     # 可以在这里添加一些恢复策略

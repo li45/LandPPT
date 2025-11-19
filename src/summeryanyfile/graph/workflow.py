@@ -117,7 +117,7 @@ class WorkflowManager(LoggerMixin):
                 progress = min((step_count / estimated_steps) * 100, 95)  # 最多95%，留5%给最终处理
                 
                 # 确定当前步骤名称
-                current_step = self._get_current_step_name(step, step_count)
+                current_step = self._determine_workflow_step_name(step, step_count)
                 
                 # 调用进度回调
                 if progress_callback:
@@ -132,11 +132,11 @@ class WorkflowManager(LoggerMixin):
             self.logger.info("PPT生成工作流执行完成")
             return final_state
             
-        except Exception as e:
-            self.logger.error(f"工作流执行失败: {e}")
+        except Exception as workflow_error:
+            self.logger.error(f"工作流执行失败: {workflow_error}")
             raise
     
-    def _get_current_step_name(self, state: Dict[str, Any], step_count: int) -> str:
+    def _determine_workflow_step_name(self, state: Dict[str, Any], step_count: int) -> str:
         """根据状态确定当前步骤名称"""
         if "document_structure" in state and step_count == 1:
             return "分析文档结构"
@@ -233,10 +233,10 @@ class WorkflowExecutor:
                 initial_state, 
                 progress_callback
             )
-        except Exception as e:
-            self.logger.error(f"工作流执行出错: {e}")
+        except Exception as execution_error:
+            self.logger.error(f"工作流执行出错: {execution_error}")
             if error_callback:
-                error_callback(e)
+                error_callback(execution_error)
             raise
     
     async def execute_with_checkpoints(
@@ -260,7 +260,7 @@ class WorkflowExecutor:
             final_state = state
             
             # 确定检查点名称
-            checkpoint_name = self._get_checkpoint_name(state)
+            checkpoint_name = self._determine_checkpoint_name(state)
             
             if checkpoint_callback:
                 checkpoint_callback(checkpoint_name, state)
@@ -269,7 +269,7 @@ class WorkflowExecutor:
         
         return final_state
     
-    def _get_checkpoint_name(self, state: Dict[str, Any]) -> str:
+    def _determine_checkpoint_name(self, state: Dict[str, Any]) -> str:
         """确定检查点名称"""
         if "document_structure" in state and "ppt_title" not in state:
             return "structure_analyzed"

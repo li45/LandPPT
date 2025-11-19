@@ -101,26 +101,26 @@ class FileHandler:
             response.raise_for_status()
             
             downloaded_size = 0
-            with open(file_path, 'wb') as f:
+            with open(file_path, 'wb') as download_file:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
-                        f.write(chunk)
+                        download_file.write(chunk)
                         downloaded_size += len(chunk)
                         
                         # 检查下载大小
                         if downloaded_size > self.max_size:
-                            f.close()
+                            download_file.close()
                             file_path.unlink()  # 删除部分下载的文件
                             raise ValueError(f"下载文件太大: {downloaded_size} bytes")
             
             logger.info(f"下载完成: {file_path} ({downloaded_size} bytes)")
             return str(file_path)
             
-        except requests.RequestException as e:
-            logger.error(f"下载失败: {e}")
+        except requests.RequestException as request_error:
+            logger.error(f"下载失败: {request_error}")
             raise
-        except Exception as e:
-            logger.error(f"处理URL时出错: {e}")
+        except Exception as download_error:
+            logger.error(f"处理URL时出错: {download_error}")
             raise
     
     def _extract_filename_from_url(self, url: str, headers: dict) -> str:

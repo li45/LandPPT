@@ -99,12 +99,12 @@ def generate(ctx, input_path, output, encoding, max_slides, min_slides, chunk_si
         sys.exit(1)
     
     # 运行生成
-    asyncio.run(_run_generation(
+    asyncio.run(_execute_ppt_generation(
         input_path, output, encoding, settings, not no_progress, save_markdown, temp_dir, not no_magic_pdf
     ))
 
 
-async def _run_generation(
+async def _execute_ppt_generation(
     input_path: str,
     output_path: Optional[str],
     encoding: Optional[str],
@@ -190,8 +190,8 @@ async def _run_generation(
                 output_file = Path(output_path)
                 output_file.parent.mkdir(parents=True, exist_ok=True)
                 
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    json.dump(result_json, f, ensure_ascii=False, indent=2)
+                with open(output_file, 'w', encoding='utf-8') as output_json_file:
+                    json.dump(result_json, output_json_file, ensure_ascii=False, indent=2)
                 
                 console.print(f"[green]PPT大纲已保存到:[/green] {output_file}")
             else:
@@ -209,9 +209,9 @@ async def _run_generation(
             if is_temp:
                 file_handler.cleanup_temp_file(local_path)
     
-    except Exception as e:
-        console.print(f"[red]生成失败:[/red] {e}")
-        logger.error(f"生成失败: {e}", exc_info=True)
+    except Exception as error:
+        console.print(f"[red]生成失败:[/red] {error}")
+        logger.error(f"生成失败: {error}", exc_info=True)
         sys.exit(1)
 
 
@@ -273,8 +273,8 @@ def validate_setup(provider):
             **settings.get_llm_kwargs()
         )
         console.print(f"[green]✓[/green] LLM连接成功: {settings.llm_model}")
-    except Exception as e:
-        console.print(f"[red]✗[/red] LLM连接失败: {e}")
+    except Exception as error:
+        console.print(f"[red]✗[/red] LLM连接失败: {error}")
 
 
 @cli.command()
@@ -318,8 +318,8 @@ def analyze(input_path):
         preview = doc_info.content[:500] + "..." if len(doc_info.content) > 500 else doc_info.content
         console.print(Panel(preview, title="内容预览"))
         
-    except Exception as e:
-        console.print(f"[red]分析失败:[/red] {e}")
+    except Exception as error:
+        console.print(f"[red]分析失败:[/red] {error}")
 
 
 @cli.command()
